@@ -8,8 +8,7 @@ import React, {
     ReactNode,
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addMessage, clearMessages } from "../store/chatSlice";
-import { RootState } from "../store";
+import { addMessage, clearMessages, selectServerUrl } from "../store/chatSlice";
 import {
     removeItemFromLocalStore,
     addItemLocalStore,
@@ -22,6 +21,7 @@ interface SocketContextProps {
     disconnect: () => void;
     sendMessage: (message: string) => void;
     connectionStatus: boolean;
+    loading: boolean;
 }
 
 const SocketContext = createContext<SocketContextProps | undefined>(undefined);
@@ -47,18 +47,34 @@ export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
     const [connectionStatus, setConnectionStatus] = useState<
         "connected" | "disconnected" | "error"
     >("disconnected");
-    const serverUrl = useSelector((state: RootState) => state.chat.serverUrl);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [connectionTimer, setConnectionTimer] = useState<number | null>(null);
+    const serverUrl = useSelector(selectServerUrl);
     const dispatch = useDispatch();
 
     const connect = () => {
         if (!serverUrl) return;
 
+        setLoading(true); // Устанавливаем состояние загрузки
+
         const ws = new WebSocket(serverUrl);
 
+        // Устанавливаем таймер для проверки состояния подключения
+        const timer = setTimeout(() => {
+            if (connectionStatus === "disconnected") {
+                console.log("Connection timed out");
+                ws.close();
+                setLoading(false);
+            }
+        }, 10000);
+
+        setConnectionTimer(timer);
         ws.onopen = () => {
             console.log("Connected to WebSocket server");
             setConnectionStatus("connected");
             addItemLocalStore("websocketConnected", "true");
+            setLoading(false); // Снимаем состояние загрузки
+            if (connectionTimer) clearTimeout(connectionTimer); // Останавливаем таймер
         };
 
         ws.onmessage = (event) => {
@@ -70,6 +86,8 @@ export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
             console.error("WebSocket error:", error);
             setConnectionStatus("error");
             removeItemFromLocalStore("websocketConnected");
+            setLoading(false); // Снимаем состояние загрузки
+            if (connectionTimer) clearTimeout(connectionTimer); // Останавливаем таймер
         };
 
         ws.onclose = (event) => {
@@ -77,6 +95,8 @@ export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
             setConnectionStatus("disconnected");
             removeItemFromLocalStore("websocketConnected");
             dispatch(clearMessages());
+            setLoading(false); // Снимаем состояние загрузки
+            if (connectionTimer) clearTimeout(connectionTimer); // Останавливаем таймер
         };
 
         setSocket(ws);
@@ -104,6 +124,8 @@ export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
             setConnectionStatus("disconnected");
             removeItemFromLocalStore("websocketConnected");
             dispatch(clearMessages());
+            setLoading(false); // Снимаем состояние загрузки
+            if (connectionTimer) clearTimeout(connectionTimer); // Останавливаем таймер
         }
     };
 
@@ -127,6 +149,7 @@ export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
                 disconnect,
                 sendMessage,
                 connectionStatus: !(connectionStatus === "connected"),
+                loading,
             }}
         >
             {children}

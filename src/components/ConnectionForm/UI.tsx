@@ -7,6 +7,7 @@ const UI = (): JSX.Element => {
         handleConnectClick,
         handleDisconnectClick,
         connectionStatus,
+        loading,
     } = useModel();
 
     return (
@@ -35,13 +36,17 @@ const UI = (): JSX.Element => {
                     </button>
                 </div>
             </div>
-            <div
-                className={`text-sm ${
-                    connectionStatus ? `text-red-600` : `text-green-600`
-                } mt-2 sm:mt-0`}
-            >
-                Статус: {connectionStatus ? "оффлайн" : "онлайн"}
-            </div>
+            {loading ? (
+                "Loading..."
+            ) : (
+                <div
+                    className={`text-sm ${
+                        connectionStatus ? `text-red-600` : `text-green-600`
+                    } mt-2 sm:mt-0`}
+                >
+                    Статус: {connectionStatus ? "оффлайн" : "онлайн"}
+                </div>
+            )}
         </div>
     );
 };

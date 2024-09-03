@@ -13,7 +13,7 @@ export const useModel = (): UseModelReturn => {
 
     const handleSendMessage = () => {
         sendMessage(message);
-        sendMessage("");
+        setMessage("");
     };
 
     return { message, setMessage, handleSendMessage, connectionStatus };

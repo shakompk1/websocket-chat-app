@@ -10,11 +10,13 @@ interface UseModelReturn {
     handleConnectClick: () => void;
     handleDisconnectClick: () => void;
     connectionStatus: boolean;
+    loading: boolean;
 }
 
 export const useModel = (): UseModelReturn => {
     const dispatch = useDispatch<AppDispatch>();
-    const { connect, disconnect, connectionStatus } = useSocketContext();
+    const { connect, disconnect, connectionStatus, loading } =
+        useSocketContext();
     const serverUrl = useSelector(selectServerUrl);
 
     const handleServerUrlChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -38,5 +40,6 @@ export const useModel = (): UseModelReturn => {
         handleConnectClick,
         handleDisconnectClick,
         connectionStatus,
+        loading,
     };
 };

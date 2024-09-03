@@ -12,7 +12,7 @@ const UI = (): JSX.Element => {
 
     return (
         <>
-            <div className="flex flex-col-reverse h-full">
+            <div className="flex flex-col-reverse h-full overflow-auto">
                 {messages.map((msg, index) => (
                     <div
                         key={index}
@@ -20,13 +20,17 @@ const UI = (): JSX.Element => {
                             msg.isSent ? "self-end" : "self-start"
                         }`}
                     >
-                        {msg.text}
-                        <button
-                            onClick={() => openModal(index)}
-                            className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                        >
-                            Удалить
-                        </button>
+                        <div className="flex items-start justify-between">
+                            <p className="whitespace-pre-wrap break-words overflow-hidden">
+                                {msg.text}
+                            </p>
+                            <button
+                                onClick={() => openModal(index)}
+                                className="ml-2 text-red-500 hover:text-red-700"
+                            >
+                                Удалить
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>
