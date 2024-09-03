@@ -1,28 +1,17 @@
-import React, { useState } from "react";
-import { useSocketContext } from "../../context/SocketContext";
+import ConnectionForm from "../ConnectionForm";
+import SendMessage from "../SendMessage";
+import Message from "../Message";
 
-const Chat: React.FC = () => {
-    const [message, setMessage] = useState("");
-    const { socket } = useSocketContext();
-
-    const handleSendMessage = () => {
-        if (socket && message) {
-            socket.send(JSON.stringify({ message }));
-            setMessage(""); // Очистить поле ввода после отправки
-        }
-    };
-
+const UI = () => {
     return (
-        <div>
-            <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type a message"
-            />
-            <button onClick={handleSendMessage}>Send</button>
+        <div className="h-screen flex flex-col w-screen bg-custom-background bg-cover bg-center p-7.5">
+            <ConnectionForm />
+            <div className="flex-grow overflow-auto p-4">
+                <Message />
+            </div>
+            <SendMessage />
         </div>
     );
 };
 
-export default Chat;
+export default UI;
