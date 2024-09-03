@@ -4,7 +4,7 @@ export default {
     theme: {
         extend: {
             backgroundImage: {
-                "custom-background": "url('src/assets/bg.jpeg')",
+                "custom-background": "url('/bg.jpeg')",
             },
             spacing: {
                 7.5: "30px",
