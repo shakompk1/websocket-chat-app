@@ -1,4 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+    loadStateFromLocalStorage,
+    saveStateToLocalStorage,
+} from "../utils/localStorage";
 
 interface Message {
     text: string;
@@ -10,11 +14,10 @@ interface ChatState {
     serverUrl: string;
 }
 
-const initialState: ChatState = {
+const initialState: ChatState = loadStateFromLocalStorage() || {
     messages: [],
-    serverUrl: "wss://ws.postman-echo.com/raw",
+    serverUrl: "",
 };
-
 
 export const chatSlice = createSlice({
     name: "chat",
@@ -22,13 +25,30 @@ export const chatSlice = createSlice({
     reducers: {
         addMessage: (state, action: PayloadAction<Message>) => {
             state.messages.push(action.payload);
+            saveStateToLocalStorage(state);
         },
-        connectToServer: (state, action: PayloadAction<string>) => {
+        changeServerUrl: (state, action: PayloadAction<string>) => {
             state.serverUrl = action.payload;
+            saveStateToLocalStorage(state);
+        },
+        deleteMessage: (state, action: PayloadAction<number>) => {
+            state.messages.splice(action.payload, 1);
+            saveStateToLocalStorage(state);
+        },
+        clearMessages: (state) => {
+            state.messages = [];
+            saveStateToLocalStorage(state);
         },
     },
 });
 
-
-export const { addMessage, connectToServer } = chatSlice.actions;
+export const { addMessage, changeServerUrl, deleteMessage, clearMessages } =
+    chatSlice.actions;
 export default chatSlice.reducer;
+
+//Selectors
+export const selectServerUrl = (state: { chat: ChatState }) =>
+    state.chat.serverUrl;
+
+export const selectMessageList = (state: { chat: ChatState }) =>
+    state.chat.messages;

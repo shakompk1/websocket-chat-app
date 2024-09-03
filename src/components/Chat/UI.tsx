@@ -2,7 +2,7 @@ import ConnectionForm from "../ConnectionForm";
 import SendMessage from "../SendMessage";
 import Message from "../Message";
 
-const UI = () => {
+const UI = (): JSX.Element => {
     return (
         <div className="h-screen flex flex-col w-screen bg-custom-background bg-cover bg-center p-7.5">
             <ConnectionForm />
